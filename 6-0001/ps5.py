@@ -46,6 +46,7 @@ def process(url):
 
         newsStory = NewsStory(guid, title, description, link, pubdate)
         ret.append(newsStory)
+        
     return ret
 
 #======================
@@ -211,22 +212,18 @@ def filter_stories(stories, triggerlist):
     
     triggered_stories = []
    
-   
     for story in stories:
         for trigger in triggerlist:
             if trigger.evaluate(story) and story not in triggered_stories:
                 triggered_stories.append(story)
         
-    return set(triggered_stories)
+    return triggered_stories
 
 
 #======================
 # User-Specified Triggers
 #======================
 # Problem 11
-
-def trigger_types(type):
-    return type.title() + 'Trigger'
 
 def read_trigger_config(filename):
     """
@@ -247,39 +244,32 @@ def read_trigger_config(filename):
     trigg_list = []
     trigg_names = {}
     
-    # single_triggers = ['TITLE', 'DESCRIPTION', 'AFTER', 'BEFORE', 'NOT']
-    # composite_triggers = ['AND', 'OR']
+    trigg_types = {'TITLE': TitleTrigger,
+                   'DESCRIPTION': DescriptionTrigger,
+                   'AFTER': AfterTrigger,
+                   'BEFORE': BeforeTrigger,
+                   'NOT': NotTrigger,
+                   'AND': AndTrigger,
+                   'OR': OrTrigger}
+    
+    single_triggers = ['TITLE', 'DESCRIPTION', 'AFTER', 'BEFORE', 'NOT']
+    composite_triggers = ['AND', 'OR']
     
     for line in lines:
         args = line.split(',')
         
-        if args[1] == 'TITLE' or args:
-            trigg_names[args[0]] = TitleTrigger(args[2])
+        if args[1] in single_triggers:
+            trigg_names[args[0]] = trigg_types[args[1]](args[2])
             
-        if args[1] == 'DESCRIPTION':
-            trigg_names[args[0]] = DescriptionTrigger(args[2])
-            
-        if args[1] == 'AFTER':
-            trigg_names[args[0]] = AfterTrigger(args[2])
-            
-        if args[1] == 'BEFORE':
-            trigg_names[args[0]] = BeforeTrigger(args[2])
-            
-        if args[1] == 'NOT':
-            trigg_names[args[0]] = NotTrigger(args[2])
-            
-        if args[1] == 'AND':
-            trigg_names[args[0]] = AndTrigger(args[2], args[3])
-            
-        if args[1] == 'OR':
-            trigg_names[args[0]] = OrTrigger(args[2], args[3])
-            
+        if args[1] in composite_triggers:
+            trigg_names[args[0]] = trigg_types[args[1]](trigg_names[args[2]], trigg_names[args[3]])
+        
         if args[0] == 'ADD':
             for name in args[1:]:
                 trigg_list.append(trigg_names[name])
     
-
     # print(lines) # for now, print it so you see what it contains!
+    
     return trigg_list
 
 
@@ -290,11 +280,11 @@ def main_thread(master):
     # A sample trigger list - you might need to change the phrases to correspond
     # to what is currently in the news
     try:
-        t1 = TitleTrigger("election")
-        t2 = DescriptionTrigger("Trump")
-        t3 = DescriptionTrigger("Clinton")
-        t4 = AndTrigger(t2, t3)
-        triggerlist = [t1, t4]
+        # t1 = TitleTrigger("election")
+        # t2 = DescriptionTrigger("Trump")
+        # t3 = DescriptionTrigger("Clinton")
+        # t4 = AndTrigger(t2, t3)
+        # triggerlist = [t1, t4]
 
         # Problem 11
         # TODO: After implementing read_trigger_config, uncomment this line 
@@ -333,8 +323,9 @@ def main_thread(master):
             # Get stories from Google's Top Stories RSS news feed
             stories = process("http://news.google.com/news?output=rss")
 
-            # Get stories from Yahoo's Top Stories RSS news feed
-            stories.extend(process("http://news.yahoo.com/rss/topstories"))
+            # Yahoo news gives AttributeError: object has no attribute 'description'
+            # # Get stories from Yahoo's Top Stories RSS news feed
+            # stories.extend(process("http://news.yahoo.com/rss/topstories"))
 
             stories = filter_stories(stories, triggerlist)
 
@@ -355,4 +346,3 @@ if __name__ == '__main__':
     t = threading.Thread(target=main_thread, args=(root,))
     t.start()
     root.mainloop()
-
