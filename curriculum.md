@@ -5,7 +5,7 @@
  | Course #          | Course Title                                            |
  | ------------------|---------------------------------------------------------| 
  | [6.0001][6.0001]  | [Introduction to Computer Science Programming in Python](6-0001.md) |
- | [6.0002][6.0002]  | Introduction to Computational Thinking and Data Science |
+ | [6.0002][6.0002]  | [Introduction to Computational Thinking and Data Science](6-0002.md) |
  | [6.009][6.009]    | Fundamentals of Programming                             |
  | [6.042[J]][6.042] | Mathematics for Computer Science                        |
  | [6.006][6.006]    | Introduction to Algorithms                              |
