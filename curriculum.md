@@ -1,4 +1,4 @@
-## Computer Science, Economics, and Data Science (Course 6-14)
+## [Computer Science, Economics, and Data Science (Course 6-14)](http://catalog.mit.edu/subjects/6/)
 
 ### Computation/Algorithms
 
